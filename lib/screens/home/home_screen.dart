@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/app_localizations.dart';
 import 'tabs/dashboard_tab.dart';
 import 'tabs/history_tab.dart';
 import 'tabs/report_tab.dart';
@@ -34,6 +35,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context);
+    
+    // Null check - WAJIB
+    if (local == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -49,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 20,
               offset: const Offset(0, -6),
             ),
@@ -63,14 +73,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _NavItem(
                   icon: Icons.home_rounded,
-                  label: 'Home',
+                  label: local.navHome,
                   index: 0,
                   currentIndex: _currentIndex,
                   onTap: () => _onTabTapped(0),
                 ),
                 _NavItem(
                   icon: Icons.history_rounded,
-                  label: 'Riwayat',
+                  label: local.navHistory,
                   index: 1,
                   currentIndex: _currentIndex,
                   onTap: () => _onTabTapped(1),
@@ -86,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryGreen.withOpacity(0.4),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.4),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -101,14 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 _NavItem(
                   icon: Icons.bar_chart_rounded,
-                  label: 'Laporan',
+                  label: local.navReport,
                   index: 3,
                   currentIndex: _currentIndex,
                   onTap: () => _onTabTapped(3),
                 ),
                 _NavItem(
                   icon: Icons.person_rounded,
-                  label: 'Profil',
+                  label: local.navProfile,
                   index: 4,
                   currentIndex: _currentIndex,
                   onTap: () => _onTabTapped(4),
@@ -152,7 +162,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: _isSelected
-              ? AppTheme.primaryGreen.withOpacity(0.10)
+              ? AppTheme.primaryGreen.withValues(alpha: 0.10)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),

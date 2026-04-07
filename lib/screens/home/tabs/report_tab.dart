@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/app_localizations.dart';
 import '../../../providers/nutrition_provider.dart';
 
 class ReportTab extends StatelessWidget {
@@ -9,15 +10,24 @@ class ReportTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nutrition = context.watch<NutritionProvider>();
+    final local = AppLocalizations.of(context);
+    
+    // Null check - WAJIB
+    if (local == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    
     // Fake weekly data
     final weeklyData = [820, 1540, 1880, 2100, 1650, 1920, nutrition.consumedCalories.round()];
-    final dayLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+    final dayLabels = [local.mon, local.tue, local.wed, local.thu, local.fri, local.sat, local.sun];
     final maxVal = 2200;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Laporan Mingguan'),
+        title: Text(local.weeklyReport),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
@@ -33,7 +43,7 @@ class ReportTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 15,
                     offset: const Offset(0, 4),
                   ),
@@ -43,9 +53,9 @@ class ReportTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
-                    const Text(
-                      'Kalori Mingguan',
-                      style: TextStyle(
+                    Text(
+                      local.weeklyCalories,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary,
@@ -59,9 +69,9 @@ class ReportTab extends StatelessWidget {
                         color: AppTheme.lightGreen,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        'Minggu ini',
-                        style: TextStyle(
+                      child: Text(
+                        local.thisWeek,
+                        style: const TextStyle(
                           color: AppTheme.darkGreen,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -138,28 +148,28 @@ class ReportTab extends StatelessWidget {
               childAspectRatio: 1.4,
               children: [
                 _StatCard(
-                  label: 'Rata-rata Kalori',
+                  label: local.avgCalories,
                   value: '1.701',
                   unit: 'kal/hari',
                   icon: Icons.local_fire_department_rounded,
                   color: AppTheme.primaryGreen,
                 ),
                 _StatCard(
-                  label: 'Hari Tercapai',
+                  label: local.daysAchieved,
                   value: '5/7',
-                  unit: 'hari',
+                  unit: local.daysAchieved,
                   icon: Icons.emoji_events_rounded,
                   color: AppTheme.carbColor,
                 ),
                 _StatCard(
-                  label: 'Protein Avg',
+                  label: local.proteinAvg,
                   value: '38',
                   unit: 'g/hari',
                   icon: Icons.fitness_center_rounded,
                   color: AppTheme.proteinColor,
                 ),
                 _StatCard(
-                  label: 'Total Makanan',
+                  label: local.totalFoodsReport,
                   value: '24',
                   unit: 'item',
                   icon: Icons.restaurant_rounded,
@@ -194,9 +204,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.15)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +216,7 @@ class _StatCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),

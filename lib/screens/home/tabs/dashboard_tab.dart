@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/app_localizations.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/nutrition_provider.dart';
 import '../../../widgets/calorie_ring.dart';
@@ -12,17 +13,25 @@ import '../../../widgets/meal_item_card.dart';
 class DashboardTab extends StatelessWidget {
   const DashboardTab({super.key});
 
-  String _getGreeting() {
+  String _getGreeting(AppLocalizations local) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Selamat Pagi';
-    if (hour < 17) return 'Selamat Siang';
-    return 'Selamat Malam';
+    if (hour < 12) return local.goodMorning;
+    if (hour < 17) return local.goodAfternoon;
+    return local.goodEvening;
   }
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>();
     final nutrition = context.watch<NutritionProvider>();
+    final local = AppLocalizations.of(context);
+    
+    // Null check - WAJIB
+    if (local == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -50,7 +59,7 @@ class DashboardTab extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _getGreeting(),
+                                  _getGreeting(local),
                                   style: const TextStyle(
                                     color: Colors.white54,
                                     fontSize: 14,
@@ -109,14 +118,14 @@ class DashboardTab extends StatelessWidget {
                           horizontal: 20,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _InfoChip(
-                              label: 'Target',
+                              label: local.target,
                               value: '${nutrition.calorieTarget} kal',
                               icon: Icons.track_changes_rounded,
                             ),
@@ -126,7 +135,7 @@ class DashboardTab extends StatelessWidget {
                               color: Colors.white12,
                             ),
                             _InfoChip(
-                              label: 'Dikonsumsi',
+                              label: local.consumed,
                               value:
                                   '${nutrition.consumedCalories.round()} kal',
                               icon: Icons.local_fire_department_rounded,
@@ -137,7 +146,7 @@ class DashboardTab extends StatelessWidget {
                               color: Colors.white12,
                             ),
                             _InfoChip(
-                              label: 'Tersisa',
+                              label: local.remaining,
                               value:
                                   '${nutrition.remainingCalories.round()} kal',
                               icon: Icons.battery_5_bar_rounded,
@@ -158,9 +167,9 @@ class DashboardTab extends StatelessWidget {
                     // Macro Section
                     FadeInUp(
                       delay: const Duration(milliseconds: 400),
-                      child: const Text(
-                        'Nutrisi Hari Ini',
-                        style: TextStyle(
+                      child: Text(
+                        local.nutritionToday,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.textPrimary,
@@ -174,7 +183,7 @@ class DashboardTab extends StatelessWidget {
                         children: [
                           Expanded(
                             child: NutritionCard(
-                              label: 'Karbohidrat',
+                              label: local.carbs,
                               consumed: nutrition.carbsConsumed,
                               target: nutrition.carbsTarget,
                               unit: 'g',
@@ -185,7 +194,7 @@ class DashboardTab extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: NutritionCard(
-                              label: 'Protein',
+                              label: local.protein,
                               consumed: nutrition.proteinConsumed,
                               target: nutrition.proteinTarget,
                               unit: 'g',
@@ -196,7 +205,7 @@ class DashboardTab extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: NutritionCard(
-                              label: 'Lemak',
+                              label: local.fat,
                               consumed: nutrition.fatConsumed,
                               target: nutrition.fatTarget,
                               unit: 'g',
@@ -212,9 +221,9 @@ class DashboardTab extends StatelessWidget {
                     // Quick Actions
                     FadeInUp(
                       delay: const Duration(milliseconds: 500),
-                      child: const Text(
-                        'Aksi Cepat',
-                        style: TextStyle(
+                      child: Text(
+                        local.quickActions,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.textPrimary,
@@ -229,7 +238,7 @@ class DashboardTab extends StatelessWidget {
                           Expanded(
                             child: _QuickActionCard(
                               icon: Icons.qr_code_scanner_rounded,
-                              label: 'Scan\nMakanan',
+                              label: local.scanFood,
                               color: AppTheme.primaryGreen,
                               onTap: () => Navigator.pushNamed(
                                 context,
@@ -241,7 +250,7 @@ class DashboardTab extends StatelessWidget {
                           Expanded(
                             child: _QuickActionCard(
                               icon: Icons.restaurant_menu_rounded,
-                              label: 'Rencana\nMakan',
+                              label: local.mealPlan,
                               color: AppTheme.carbColor,
                               onTap: () => Navigator.pushNamed(
                                 context,
@@ -253,7 +262,7 @@ class DashboardTab extends StatelessWidget {
                           Expanded(
                             child: _QuickActionCard(
                               icon: Icons.water_drop_rounded,
-                              label: 'Catat\nAir',
+                              label: local.recordWater,
                               color: const Color(0xFF3498DB),
                               onTap: () {},
                             ),
@@ -269,16 +278,16 @@ class DashboardTab extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Makanan Terbaru',
-                            style: TextStyle(
+                          Text(
+                            local.recentMeals,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.textPrimary,
                             ),
                           ),
                           Text(
-                            'Lihat Semua',
+                            local.viewAll,
                             style: TextStyle(
                               fontSize: 13,
                               color: AppTheme.primaryGreen,
@@ -371,9 +380,9 @@ class _QuickActionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.10),
+          color: color.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: color.withOpacity(0.15)),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Column(
           children: [
@@ -381,7 +390,7 @@ class _QuickActionCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 24),

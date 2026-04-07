@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/app_localizations.dart';
 import '../../../providers/nutrition_provider.dart';
 import '../../../widgets/meal_item_card.dart';
 
@@ -12,11 +13,19 @@ class HistoryTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final nutrition = context.watch<NutritionProvider>();
     final logsByType = nutrition.logsByType;
+    final local = AppLocalizations.of(context);
+    
+    // NULL CHECK - WAJIB
+    if (local == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Riwayat Makan'),
+        title: Text(local.historyTitle),
         centerTitle: false,
         actions: [
           Padding(
@@ -52,7 +61,7 @@ class HistoryTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
@@ -62,19 +71,19 @@ class HistoryTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _SummaryItem(
-                    label: 'Total Kalori',
+                    label: local.totalCalories,
                     value: '${nutrition.consumedCalories.round()}',
                     unit: 'kal',
                   ),
                   Container(width: 1, height: 40, color: Colors.white24),
                   _SummaryItem(
-                    label: 'Makanan',
+                    label: local.totalFoods,
                     value: '${nutrition.mealLogs.length}',
                     unit: 'item',
                   ),
                   Container(width: 1, height: 40, color: Colors.white24),
                   _SummaryItem(
-                    label: 'Tersisa',
+                    label: local.remaining,
                     value: '${nutrition.remainingCalories.round()}',
                     unit: 'kal',
                   ),
@@ -112,8 +121,7 @@ class HistoryTab extends StatelessWidget {
                         emoji: '🍽️',
                         name: log.name,
                         calories: log.calories,
-                        mealType:
-                            DateFormat('HH:mm').format(log.time),
+                        mealType: DateFormat('HH:mm').format(log.time),
                       )),
                   const SizedBox(height: 16),
                 ],

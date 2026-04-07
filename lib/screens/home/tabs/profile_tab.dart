@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/app_localizations.dart';
 import '../../../providers/user_provider.dart';
-import '../../../providers/nutrition_provider.dart';
+import 'language_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -10,141 +12,169 @@ class ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>();
-    final nutrition = context.watch<NutritionProvider>();
+    final local = AppLocalizations.of(context);
+
+    if (local == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: Text(local.navProfile),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Profile header
+            // Profile Header
             Container(
-              padding: const EdgeInsets.fromLTRB(24, 60, 24, 32),
-              decoration: const BoxDecoration(
-                gradient: AppTheme.darkGradient,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(36),
-                  bottomRight: Radius.circular(36),
-                ),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(24),
               ),
-              child: Column(
+              child: Row(
                 children: [
                   Container(
-                    width: 88,
-                    height: 88,
+                    width: 70,
+                    height: 70,
                     decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white30, width: 3),
-                    ),
-                    child: const Icon(Icons.person_rounded,
-                        color: Colors.white, size: 48),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    user.name.isEmpty ? 'GoHealth User' : user.name,
-                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.person_rounded,
+                        size: 40,
+                        color: AppTheme.primaryGreen,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    user.email.isEmpty ? 'user@gohealth.ai' : user.email,
-                    style: const TextStyle(color: Colors.white54, fontSize: 13),
-                  ),
-                  const SizedBox(height: 20),
-                  // Stats row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _ProfileStat(
-                        label: 'Tinggi',
-                        value: '${user.heightCm.round()} cm',
-                      ),
-                      _ProfileStat(
-                        label: 'BMI',
-                        value: user.bmi > 0
-                            ? user.bmi.toStringAsFixed(1)
-                            : '21.4',
-                        sub: user.bmi > 0 ? user.bmiCategory : 'Normal',
-                        subColor: AppTheme.primaryGreen,
-                      ),
-                      _ProfileStat(
-                        label: 'Berat',
-                        value: '${user.weightKg.round()} kg',
-                      ),
-                    ],
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.name.isEmpty ? 'User GoHealth' : user.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          user.email.isEmpty ? 'user@gohealth.ai' : user.email,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            Padding(
+            const SizedBox(height: 24),
+
+            // Stats Card
+            Container(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  _SectionTitle('Kesehatan'),
-                  _MenuItem(
-                    icon: Icons.track_changes_rounded,
-                    label: 'Target Kalori Harian',
-                    trailing:
-                        '${nutrition.calorieTarget} kal',
-                    iconColor: AppTheme.primaryGreen,
-                  ),
-                  _MenuItem(
-                    icon: Icons.monitor_weight_rounded,
-                    label: 'Berat Badan',
-                    trailing: '${user.weightKg.round()} kg',
-                    iconColor: AppTheme.carbColor,
-                  ),
-                  _MenuItem(
-                    icon: Icons.height_rounded,
-                    label: 'Tinggi Badan',
-                    trailing: '${user.heightCm.round()} cm',
-                    iconColor: AppTheme.proteinColor,
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionTitle('Pengaturan'),
-                  _MenuItem(
-                    icon: Icons.notifications_rounded,
-                    label: 'Notifikasi',
-                    iconColor: AppTheme.fatColor,
-                  ),
-                  _MenuItem(
-                    icon: Icons.language_rounded,
-                    label: 'Bahasa',
-                    trailing: 'Indonesia',
-                    iconColor: const Color(0xFF3498DB),
-                  ),
-                  _MenuItem(
-                    icon: Icons.privacy_tip_rounded,
-                    label: 'Kebijakan Privasi',
-                    iconColor: AppTheme.textSecondary,
-                  ),
-                  const SizedBox(height: 16),
-                  _MenuItem(
-                    icon: Icons.logout_rounded,
-                    label: 'Keluar',
-                    iconColor: Colors.red.shade400,
-                    textColor: Colors.red.shade400,
-                    showArrow: false,
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/',
-                      (r) => false,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'GoHealth v1.0.0 • Smart Food AI',
-                    style: TextStyle(
-                      color: AppTheme.textHint,
-                      fontSize: 12,
-                    ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
                   ),
                 ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _ProfileStat(
+                    label: 'Tinggi',
+                    value: '${user.heightCm.toStringAsFixed(0)} cm',
+                    icon: Icons.height_rounded,
+                  ),
+                  Container(width: 1, height: 40, color: AppTheme.textHint),
+                  _ProfileStat(
+                    label: 'Berat',
+                    value: '${user.weightKg.toStringAsFixed(0)} kg',
+                    icon: Icons.monitor_weight_rounded,
+                  ),
+                  Container(width: 1, height: 40, color: AppTheme.textHint),
+                  _ProfileStat(
+                    label: 'BMI',
+                    value: user.bmi.toStringAsFixed(1),
+                    icon: Icons.calculate_rounded,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Menu Items
+            _MenuCard(
+              icon: Icons.language_rounded,
+              title: 'Bahasa',
+              subtitle: 'Ganti bahasa aplikasi',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LanguageScreen()),
+                );
+              },
+            ),
+            _MenuCard(
+              icon: Icons.privacy_tip_rounded,
+              title: 'Kebijakan Privasi',
+              subtitle: 'Lihat kebijakan privasi',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                );
+              },
+            ),
+            _MenuCard(
+              icon: Icons.info_rounded,
+              title: 'Tentang Aplikasi',
+              subtitle: 'Versi 1.0.0',
+              onTap: () {},
+            ),
+            const SizedBox(height: 20),
+            // Logout Button
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: TextButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.logout_rounded, color: Colors.red),
+                label: const Text(
+                  'Keluar',
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             ),
           ],
@@ -157,126 +187,95 @@ class ProfileTab extends StatelessWidget {
 class _ProfileStat extends StatelessWidget {
   final String label;
   final String value;
-  final String? sub;
-  final Color? subColor;
+  final IconData icon;
 
-  const _ProfileStat({required this.label, required this.value, this.sub, this.subColor});
+  const _ProfileStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700)),
-        if (sub != null)
-          Text(sub!,
-              style: TextStyle(
-                  color: subColor ?? Colors.white54, fontSize: 12)),
-        Text(label,
-            style: const TextStyle(color: Colors.white38, fontSize: 11)),
+        Icon(icon, size: 20, color: AppTheme.primaryGreen),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppTheme.textSecondary,
+          ),
+        ),
       ],
     );
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textSecondary,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MenuItem extends StatelessWidget {
+class _MenuCard extends StatelessWidget {
   final IconData icon;
-  final String label;
-  final String? trailing;
-  final Color iconColor;
-  final Color? textColor;
-  final bool showArrow;
-  final VoidCallback? onTap;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
 
-  const _MenuItem({
+  const _MenuCard({
     required this.icon,
-    required this.label,
-    this.trailing,
-    required this.iconColor,
-    this.textColor,
-    this.showArrow = true,
-    this.onTap,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-            ),
-          ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: AppTheme.primaryGreen),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: textColor ?? AppTheme.textPrimary,
-                ),
-              ),
-            ),
-            if (trailing != null)
-              Text(trailing!,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  )),
-            if (showArrow) ...[
-              const SizedBox(width: 6),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppTheme.textHint, size: 20),
-            ],
-          ],
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textPrimary,
+          ),
         ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right_rounded,
+            color: AppTheme.textHint),
+        onTap: onTap,
       ),
     );
   }
