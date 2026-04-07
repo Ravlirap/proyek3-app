@@ -59,7 +59,9 @@ class DashboardTab extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  user.name.isEmpty ? 'User GoHealth!' : '${user.name}! 👋',
+                                  user.name.isEmpty
+                                      ? 'User GoHealth!'
+                                      : '${user.name}! 👋',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 22,
@@ -103,7 +105,9 @@ class DashboardTab extends StatelessWidget {
                       delay: const Duration(milliseconds: 350),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            vertical: 14, horizontal: 20),
+                          vertical: 14,
+                          horizontal: 20,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(16),
@@ -228,7 +232,9 @@ class DashboardTab extends StatelessWidget {
                               label: 'Scan\nMakanan',
                               color: AppTheme.primaryGreen,
                               onTap: () => Navigator.pushNamed(
-                                  context, AppConstants.scanRoute),
+                                context,
+                                AppConstants.scanRoute,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -238,7 +244,9 @@ class DashboardTab extends StatelessWidget {
                               label: 'Rencana\nMakan',
                               color: AppTheme.carbColor,
                               onTap: () => Navigator.pushNamed(
-                                  context, AppConstants.mealPlanRoute),
+                                context,
+                                AppConstants.mealPlanRoute,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -286,12 +294,14 @@ class DashboardTab extends StatelessWidget {
                       child: Column(
                         children: nutrition.mealLogs
                             .take(3)
-                            .map((log) => MealItemCard(
-                                  emoji: '🍽️',
-                                  name: log.name,
-                                  calories: log.calories,
-                                  mealType: log.mealType,
-                                ))
+                            .map(
+                              (log) => MealItemCard(
+                                emoji: '🍽️',
+                                name: log.name,
+                                calories: log.calories,
+                                mealType: log.mealType,
+                              ),
+                            )
                             .toList(),
                       ),
                     ),
@@ -334,10 +344,7 @@ class _InfoChip extends StatelessWidget {
         ),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white38,
-            fontSize: 10,
-          ),
+          style: const TextStyle(color: Colors.white38, fontSize: 10),
         ),
       ],
     );

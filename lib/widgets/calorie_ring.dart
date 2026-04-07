@@ -41,7 +41,7 @@ class CalorieRing extends StatelessWidget {
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w800,
-              color: AppTheme.textPrimary,
+              color: Color.fromARGB(255, 223, 255, 241),
               height: 1.0,
             ),
           ),
@@ -49,7 +49,7 @@ class CalorieRing extends StatelessWidget {
             'kal',
             style: TextStyle(
               fontSize: 14,
-              color: AppTheme.textSecondary,
+              color: Color.fromARGB(255, 198, 255, 221),
               fontWeight: FontWeight.w500,
             ),
           ),
