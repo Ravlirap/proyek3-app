@@ -27,6 +27,28 @@ class NutritionProvider with ChangeNotifier {
   double _proteinConsumed = 42;
   double _fatConsumed = 22;
 
+  // Tambahkan di dalam class NutritionProvider
+
+// Getter untuk total kalori per jenis makan
+Map<String, double> get caloriesByMealType {
+  final map = <String, double>{};
+  for (final log in _mealLogs) {
+    map[log.mealType] = (map[log.mealType] ?? 0) + log.calories;
+  }
+  return map;
+}
+
+// Target kalori per jenis makan (contoh)
+double get targetBreakfast => calorieTarget * 0.25; // 25% dari target
+double get targetLunch => calorieTarget * 0.35;     // 35% dari target
+double get targetDinner => calorieTarget * 0.30;    // 30% dari target
+double get targetSnack => calorieTarget * 0.10;     // 10% dari target
+
+// Mendapatkan kalori yang sudah dikonsumsi per jenis makan
+double get consumedBreakfast => caloriesByMealType['Breakfast'] ?? 0;
+double get consumedLunch => caloriesByMealType['Lunch'] ?? 0;
+double get consumedDinner => caloriesByMealType['Dinner'] ?? 0;
+double get consumedSnack => caloriesByMealType['Snack'] ?? 0;
   final List<MealLog> _mealLogs = [
     MealLog(
       name: 'Oatmeal Berry Bowl',

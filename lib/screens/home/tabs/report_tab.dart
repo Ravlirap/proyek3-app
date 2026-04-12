@@ -12,239 +12,351 @@ class ReportTab extends StatelessWidget {
     final nutrition = context.watch<NutritionProvider>();
     final local = AppLocalizations.of(context);
     
-    // Null check - WAJIB
     if (local == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
     
-    // Fake weekly data
-    final weeklyData = [820, 1540, 1880, 2100, 1650, 1920, nutrition.consumedCalories.round()];
-    final dayLabels = [local.mon, local.tue, local.wed, local.thu, local.fri, local.sat, local.sun];
-    final maxVal = 2200;
-
+    // DATA LENGKAP 7 HARI
+    final List<DailyCalorie> weeklyData = [
+      DailyCalorie(day: 'Senin', date: '5 Apr', calories: 820, isError: false, errorMsg: null),
+      DailyCalorie(day: 'Selasa', date: '6 Apr', calories: 1540, isError: false, errorMsg: null),
+      DailyCalorie(day: 'Rabu', date: '7 Apr', calories: 1880, isError: false, errorMsg: null),
+      DailyCalorie(day: 'Kamis', date: '8 Apr', calories: 2100, isError: false, errorMsg: null),
+      DailyCalorie(day: 'Jumat', date: '9 Apr', calories: 1650, isError: false, errorMsg: null),
+      DailyCalorie(day: 'Sabtu', date: '10 Apr', calories: 1850, isError: false, errorMsg: null),
+      DailyCalorie(day: 'Minggu', date: '11 Apr', calories: 740, isError: false, errorMsg: null),
+    ];
+    
+    final int targetMin = 1600;
+    final int targetMax = 2100;
+    final int avgCalories = 1701;
+    final int daysAchieved = 5;
+    final int avgProtein = 38;
+    final int totalFoods = 24;
+    
+    final validDays = weeklyData.where((d) => !d.isError).toList();
+    final bestDay = validDays.reduce((a, b) => a.calories > b.calories ? a : b);
+    final worstDay = validDays.reduce((a, b) => a.calories < b.calories ? a : b);
+    
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(local.weeklyReport),
         centerTitle: false,
+        elevation: 0,
+        backgroundColor: const Color.fromARGB(0, 23, 2, 2),
+        foregroundColor: const Color.fromARGB(255, 0, 6, 3),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Bar chart card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 15,
-                    offset: const Offset(0, 4),
+            // 3 KARTU STATISTIK
+            Row(
+              children: [
+                _buildMainStatCard(
+                  icon: Icons.local_fire_department_rounded,
+                  value: '$avgCalories',
+                  unit: 'kal',
+                  label: local.avgCalories,
+                  color: const Color.fromARGB(255, 254, 42, 0),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildMainStatCard(
+                    icon: Icons.emoji_events_rounded,
+                    value: '$daysAchieved/7',
+                    unit: 'hari',
+                    label: local.daysAchieved,
+                    color: Colors.green,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildMainStatCard(
+                    icon: Icons.fitness_center_rounded,
+                    value: '$avgProtein',
+                    unit: 'g',
+                    label: local.proteinAvg,
+                    color: Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // GRAFIK BAR CHART (FIXED - NO OVERFLOW)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: _cardDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [
-                    Text(
-                      local.weeklyCalories,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppTheme.lightGreen,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        local.thisWeek,
+                  Row(
+                    children: [
+                      const Icon(Icons.bar_chart_rounded, size: 20, color: AppTheme.textSecondary),
+                      const SizedBox(width: 8),
+                      Text(
+                        local.weeklyCalories,
                         style: const TextStyle(
-                          color: AppTheme.darkGreen,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color.fromARGB(255, 1, 3, 2),
                         ),
                       ),
-                    ),
-                  ]),
-                  const SizedBox(height: 24),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.lightGreen,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          local.thisWeek,
+                          style: const TextStyle(
+                            color: AppTheme.darkGreen,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Scrollable bar chart
                   SizedBox(
-                    height: 160,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(7, (i) {
-                        final pct = weeklyData[i] / maxVal;
-                        final isToday = i == 6;
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${weeklyData[i]}',
-                              style: TextStyle(
-                                fontSize: 9,
-                                color: isToday
-                                    ? AppTheme.primaryGreen
-                                    : AppTheme.textHint,
-                                fontWeight: FontWeight.w600,
-                              ),
+                    height: 170,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: List.generate(weeklyData.length, (i) {
+                          final data = weeklyData[i];
+                          final maxCal = 2200.0;
+                          double heightPercent = data.isError ? 0.3 : (data.calories / maxCal).clamp(0.08, 1.0);
+                          final barHeight = (heightPercent * 120).clamp(12.0, 120.0);
+                          final isBest = !data.isError && data.calories == bestDay.calories;
+                          
+                          return SizedBox(
+                            width: 50,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                if (data.isError)
+                                  const Icon(Icons.error_outline, size: 14, color: Colors.red)
+                                else
+                                  Text(
+                                    '${data.calories}',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: isBest ? FontWeight.bold : FontWeight.normal,
+                                      color: _getColorByCalorie(data.calories, targetMin, targetMax),
+                                    ),
+                                  ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: 32,
+                                  height: barHeight,
+                                  decoration: BoxDecoration(
+                                    color: data.isError
+                                        ? const Color.fromARGB(255, 243, 23, 23)
+                                        : _getColorByCalorie(data.calories, targetMin, targetMax).withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _shortDayName(data.day),
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  data.date,
+                                  style: const TextStyle(fontSize: 8, color: AppTheme.textHint),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
-                            AnimatedContainer(
-                              duration:
-                                  Duration(milliseconds: 600 + i * 100),
-                              curve: Curves.easeOut,
-                              width: 32,
-                              height: (pct * 130).clamp(8.0, 130.0),
-                              decoration: BoxDecoration(
-                                gradient: isToday
-                                    ? AppTheme.primaryGradient
-                                    : null,
-                                color: isToday ? null : AppTheme.lightGreen,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              dayLabels[i],
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isToday
-                                    ? AppTheme.primaryGreen
-                                    : AppTheme.textHint,
-                                fontWeight: isToday
-                                    ? FontWeight.w700
-                                    : FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                     ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLegend('Rendah', Colors.red),
+                      const SizedBox(width: 10),
+                      _buildLegend('Normal', Colors.green),
+                      const SizedBox(width: 10),
+                      _buildLegend('Tinggi', Colors.orange),
+                    ],
                   ),
                 ],
               ),
             ),
+            
             const SizedBox(height: 20),
-            // Stats grid
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              childAspectRatio: 1.4,
-              children: [
-                _StatCard(
-                  label: local.avgCalories,
-                  value: '1.701',
-                  unit: 'kal/hari',
-                  icon: Icons.local_fire_department_rounded,
-                  color: AppTheme.primaryGreen,
-                ),
-                _StatCard(
-                  label: local.daysAchieved,
-                  value: '5/7',
-                  unit: local.daysAchieved,
-                  icon: Icons.emoji_events_rounded,
-                  color: AppTheme.carbColor,
-                ),
-                _StatCard(
-                  label: local.proteinAvg,
-                  value: '38',
-                  unit: 'g/hari',
-                  icon: Icons.fitness_center_rounded,
-                  color: AppTheme.proteinColor,
-                ),
-                _StatCard(
-                  label: local.totalFoodsReport,
-                  value: '24',
-                  unit: 'item',
-                  icon: Icons.restaurant_rounded,
-                  color: AppTheme.fatColor,
-                ),
-              ],
+            
+            // RINGKASAN
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: _cardDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('📊 Ringkasan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 12),
+                  _buildInfoRow('🍽️ Total Makanan', '$totalFoods items'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('🎯 Target Harian', '$targetMin - $targetMax kalori'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('🏆 Hari Terbaik', '${bestDay.day} (${bestDay.calories} kal)'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('⚠️ Hari Terendah', '${worstDay.day} (${worstDay.calories} kal)'),
+                  if (weeklyData.any((d) => d.isError)) ...[
+                    const SizedBox(height: 8),
+                    _buildInfoRow('Data Terendah ', '${worstDay.day} (${worstDay.calories} kal)'),
+                  ],
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // SARAN
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.lightGreen,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('💡 Saran Minggu Depan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 10),
+                  _buildSuggestion('🥩 Tingkatkan protein di hari Senin & Minggu'),
+                  const SizedBox(height: 6),
+                  _buildSuggestion('⚠️ Perbaiki data error di hari Jumat'),
+                  const SizedBox(height: 6),
+                  _buildSuggestion('📈 Pertahankan konsistensi seperti hari Kamis'),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
-
-class _StatCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String unit;
-  final IconData icon;
-  final Color color;
-
-  const _StatCard({
-    required this.label,
-    required this.value,
-    required this.unit,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.15)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
+  
+  Widget _buildMainStatCard({
+    required IconData icon,
+    required String value,
+    required String unit,
+    required String label,
+    required Color color,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
             ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                ),
-              ),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.textSecondary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ],
+            Text(unit, style: const TextStyle(fontSize: 9, color: AppTheme.textHint)),
+            const SizedBox(height: 2),
+            Text(label, style: const TextStyle(fontSize: 9, color: AppTheme.textSecondary), textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }
+  
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+  
+  Widget _buildSuggestion(String text) {
+    return Row(
+      children: [
+        const Text('• ', style: TextStyle(fontSize: 12)),
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 12))),
+      ],
+    );
+  }
+  
+  Widget _buildLegend(String label, Color color) {
+    return Row(
+      children: [
+        Container(width: 10, height: 10, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 9, color: AppTheme.textHint)),
+      ],
+    );
+  }
+  
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2)),
+      ],
+    );
+  }
+  
+  Color _getColorByCalorie(int calorie, int min, int max) {
+    if (calorie < min) return Colors.red;
+    if (calorie > max) return Colors.orange;
+    return Colors.green;
+  }
+  
+  String _shortDayName(String day) {
+    if (day.contains('Sen')) return 'Sen';
+    if (day.contains('Sel')) return 'Sel';
+    if (day.contains('Rab')) return 'Rab';
+    if (day.contains('Kam')) return 'Kam';
+    if (day.contains('Jum')) return 'Jum';
+    if (day.contains('Sab')) return 'Sab';
+    if (day.contains('Min')) return 'Min';
+    return day.length > 3 ? day.substring(0, 3) : day;
+  }
+}
+
+class DailyCalorie {
+  final String day;
+  final String date;
+  final int calories;
+  final bool isError;
+  final String? errorMsg;
+  
+  DailyCalorie({
+    required this.day,
+    required this.date,
+    required this.calories,
+    required this.isError,
+    this.errorMsg,
+  });
 }
