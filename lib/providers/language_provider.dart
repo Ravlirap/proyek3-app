@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 class LanguageProvider extends ChangeNotifier {
   Locale _locale = const Locale('id', 'ID'); // Default Indonesia

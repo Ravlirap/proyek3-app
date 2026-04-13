@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // jika pakai provider, sesuaikan
+// jika pakai provider, sesuaikan
 
 class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
