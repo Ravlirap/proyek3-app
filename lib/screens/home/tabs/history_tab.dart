@@ -1,163 +1,435 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/app_localizations.dart';
-import '../../../providers/nutrition_provider.dart';
-import '../../../widgets/meal_item_card.dart';
+// lib/screens/tabs/history_tab.dart
 
-class HistoryTab extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class HistoryTab extends StatefulWidget {
   const HistoryTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final nutrition = context.watch<NutritionProvider>();
-    final logsByType = nutrition.logsByType;
-    final local = AppLocalizations.of(context);
-    
-    // NULL CHECK - WAJIB
-    if (local == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+  State<HistoryTab> createState() => _HistoryTabState();
+}
 
+class _HistoryTabState extends State<HistoryTab> {
+  String _selectedFilter = 'Harian';
+  final List<String> _filters = ['Harian', 'Mingguan', 'Bulanan'];
+
+  // DATA YANG BENER - berupa List, bukan Map
+  final List<Map<String, dynamic>> _allHistoryData = [
+    {
+      'date': '2026-04-15',
+      'totalCalories': 740,
+      'totalItems': 4,
+      'remaining': 590,
+      'meals': [
+        {
+          'type': 'Sarapan',
+          'items': [
+            {'name': 'Oatmeal Berry Bowl', 'time': '03:46', 'calories': 320},
+            {'name': 'Telur Rebus', 'time': '03:16', 'calories': 140},
+          ],
+        },
+        {
+          'type': 'Camilan',
+          'items': [
+            {'name': 'Greek Yogurt', 'time': '05:46', 'calories': 130},
+            {'name': 'Almond', 'time': '07:46', 'calories': 150},
+          ],
+        },
+      ],
+    },
+  ];
+
+  // Ambil data hari ini (index 0)
+  Map<String, dynamic> get _todayData => _allHistoryData[0];
+
+  String get _formattedDate {
+    return DateFormat('EEEE, d MMMM yyyy', 'id').format(DateTime.now());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        title: Text(local.historyTitle),
-        centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppTheme.lightGreen,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                DateFormat('dd MMM yyyy').format(DateTime.now()),
-                style: const TextStyle(
-                  color: AppTheme.darkGreen,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+      backgroundColor: Colors.grey[50],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _formattedDate,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Riwayat Makanan',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2E7D32),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+
+              // Filter Chips
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: _filters.map((filter) {
+                    final isSelected = _selectedFilter == filter;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedFilter = filter;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFF4CAF50)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.transparent
+                                  : Colors.grey[300]!,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF4CAF50)
+                                          .withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Text(
+                            filter,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.grey[700],
+                              fontWeight:
+                                  isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Summary Row - 3 Cards
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    _buildSummaryCard(
+                      title: 'Total Kebutuhan 1 hari',
+                      value: '${_todayData['totalCalories']}',
+                      unit: 'kal',
+                      color: Colors.orange,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildSummaryCard(
+                      title: 'Total Kebutuhan',
+                      value: '${_todayData['totalItems']}',
+                      unit: 'item',
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildSummaryCard(
+                      title: 'Tersisa',
+                      value: '${_todayData['remaining']}',
+                      unit: 'kal',
+                      color: Colors.green,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Meals Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    // Looping meals dengan aman
+                    for (var i = 0; i < (_todayData['meals'] as List).length; i++)
+                      _buildMealCard(
+                        mealType: (_todayData['meals'][i] as Map)['type'] as String,
+                        items: (_todayData['meals'][i] as Map)['items'] as List<Map<String, dynamic>>,
+                      ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 80),
+            ],
           ),
-        ],
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+    );
+  }
+
+  Widget _buildSummaryCard({
+    required String title,
+    required String value,
+    required String unit,
+    required Color color,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Summary card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[500],
+                height: 1.3,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _SummaryItem(
-                    label: local.totalCalories,
-                    value: '${nutrition.consumedCalories.round()}',
-                    unit: 'kal',
-                  ),
-                  Container(width: 1, height: 40, color: Colors.white24),
-                  _SummaryItem(
-                    label: local.totalFoods,
-                    value: '${nutrition.mealLogs.length}',
-                    unit: 'item',
-                  ),
-                  Container(width: 1, height: 40, color: Colors.white24),
-                  _SummaryItem(
-                    label: local.remaining,
-                    value: '${nutrition.remainingCalories.round()}',
-                    unit: 'kal',
-                  ),
-                ],
-              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 24),
-            ...logsByType.entries.map((entry) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryGreen,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        entry.key,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                    ],
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color,
                   ),
-                  const SizedBox(height: 12),
-                  ...entry.value.map((log) => MealItemCard(
-                        emoji: '🍽️',
-                        name: log.name,
-                        calories: log.calories,
-                        mealType: DateFormat('HH:mm').format(log.time),
-                      )),
-                  const SizedBox(height: 16),
-                ],
-              );
-            }),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  unit,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[400],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
-}
 
-class _SummaryItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final String unit;
-
-  const _SummaryItem({required this.label, required this.value, required this.unit});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
+  Widget _buildMealCard({
+    required String mealType,
+    required List<Map<String, dynamic>> items,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        ),
-        Text(unit, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-        const SizedBox(height: 2),
-        Text(label,
-            style: const TextStyle(color: Colors.white54, fontSize: 11)),
-      ],
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Meal Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _getMealColor(mealType),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      mealType,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${items.length} menu',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Divider
+          Container(
+            height: 1,
+            color: Colors.grey[100],
+          ),
+
+          // Food Items
+          ...items.map((item) => _buildFoodItem(
+                name: item['name'] as String,
+                time: item['time'] as String,
+                calories: item['calories'] as int,
+              )),
+        ],
+      ),
     );
+  }
+
+  Widget _buildFoodItem({
+    required String name,
+    required String time,
+    required int calories,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          // Food icon
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.restaurant_outlined,
+              size: 22,
+              color: Colors.grey[500],
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Food info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 12,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      time,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Calories
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '$calories kal',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.orange,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getMealColor(String mealType) {
+    switch (mealType) {
+      case 'Sarapan':
+        return Colors.orange;
+      case 'Camilan':
+        return Colors.purple;
+      case 'Makan Siang':
+        return Colors.blue;
+      case 'Makan Malam':
+        return Colors.indigo;
+      default:
+        return Colors.green;
+    }
   }
 }
