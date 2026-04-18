@@ -1,7 +1,7 @@
 class AppConstants {
   // App info
   static const String appName = 'GoHealth';
-  static const String appTagline = 'Smart Food AI for a Healthier Life';
+  static const String appTagline = 'Your Health, Your Choice.';
 
   // Routes
   static const String splashRoute = '/';
@@ -12,6 +12,7 @@ class AppConstants {
   static const String scanRoute = '/scan';
   static const String analysisResultRoute = '/analysis-result';
   static const String mealPlanRoute = '/meal-plan';
+  static const String recommendationRoute = '/recommendation';
 
   // Default values
   static const int defaultCalorieTarget = 2000;
