@@ -79,20 +79,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        width: 56,
-                        height: 56,
+                        width: 100,
+                        height: 100,
                         decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
-                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
                         ),
-                        child: const Icon(Icons.eco_rounded,
-                            color: Colors.white, size: 30),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Image.asset(
+                            'assets/images/logo_2.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 24),
                       const Text(
-                        'Selamat Datang\nKembali! 👋',
+                        'Selamat Datang Kembali 👋',
                         style: TextStyle(
-                          fontSize: 30,
+                          fontSize: 28,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.textPrimary,
                           height: 1.2,
@@ -100,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Masuk untuk lanjutkan perjalanan sehat Anda',
+                        'Login untuk melanjutkan perjalanan sehat Anda',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppTheme.textSecondary,

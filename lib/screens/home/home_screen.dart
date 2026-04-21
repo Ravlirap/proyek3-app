@@ -154,33 +154,58 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isSelected = _isSelected;
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: _isSelected
-              ? AppTheme.primaryGreen.withValues(alpha: 0.10)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 16 : 12,
+          vertical: 10,
         ),
-        child: Column(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppTheme.primaryGreen.withValues(alpha: 0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: _isSelected ? AppTheme.primaryGreen : AppTheme.textHint,
-              size: 24,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+              child: Icon(
+                icon,
+                key: ValueKey<bool>(isSelected),
+                color: isSelected ? AppTheme.primaryGreen : AppTheme.textHint,
+                size: 24,
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: _isSelected ? AppTheme.primaryGreen : AppTheme.textHint,
-                fontSize: 10,
-                fontWeight: _isSelected ? FontWeight.w700 : FontWeight.w400,
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              child: SizedBox(
+                width: isSelected ? null : 0,
+                child: isSelected
+                    ? Padding(
+                        padding: const EdgeInsets.only(left: 6.0),
+                        child: Text(
+                          label,
+                          style: const TextStyle(
+                            color: AppTheme.primaryGreen,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.visible,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ),
           ],

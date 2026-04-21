@@ -11,35 +11,77 @@ class ReportTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final nutrition = context.watch<NutritionProvider>();
     final local = AppLocalizations.of(context);
-    
+
     if (local == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    
+
     // DATA LENGKAP 7 HARI
     final List<DailyCalorie> weeklyData = [
-      DailyCalorie(day: 'Senin', date: '5 Apr', calories: 820, isError: false, errorMsg: null),
-      DailyCalorie(day: 'Selasa', date: '6 Apr', calories: 1540, isError: false, errorMsg: null),
-      DailyCalorie(day: 'Rabu', date: '7 Apr', calories: 1880, isError: false, errorMsg: null),
-      DailyCalorie(day: 'Kamis', date: '8 Apr', calories: 2100, isError: false, errorMsg: null),
-      DailyCalorie(day: 'Jumat', date: '9 Apr', calories: 1650, isError: false, errorMsg: null),
-      DailyCalorie(day: 'Sabtu', date: '10 Apr', calories: 1850, isError: false, errorMsg: null),
-      DailyCalorie(day: 'Minggu', date: '11 Apr', calories: 740, isError: false, errorMsg: null),
+      DailyCalorie(
+        day: 'Senin',
+        date: '5 Apr',
+        calories: 820,
+        isError: false,
+        errorMsg: null,
+      ),
+      DailyCalorie(
+        day: 'Selasa',
+        date: '6 Apr',
+        calories: 1540,
+        isError: false,
+        errorMsg: null,
+      ),
+      DailyCalorie(
+        day: 'Rabu',
+        date: '7 Apr',
+        calories: 1880,
+        isError: false,
+        errorMsg: null,
+      ),
+      DailyCalorie(
+        day: 'Kamis',
+        date: '8 Apr',
+        calories: 2100,
+        isError: false,
+        errorMsg: null,
+      ),
+      DailyCalorie(
+        day: 'Jumat',
+        date: '9 Apr',
+        calories: 1650,
+        isError: false,
+        errorMsg: null,
+      ),
+      DailyCalorie(
+        day: 'Sabtu',
+        date: '10 Apr',
+        calories: 1850,
+        isError: false,
+        errorMsg: null,
+      ),
+      DailyCalorie(
+        day: 'Minggu',
+        date: '11 Apr',
+        calories: 740,
+        isError: false,
+        errorMsg: null,
+      ),
     ];
-    
+
     final int targetMin = 1600;
     final int targetMax = 2100;
     final int avgCalories = 1701;
     final int daysAchieved = 5;
     final int avgProtein = 38;
     final int totalFoods = 24;
-    
+
     final validDays = weeklyData.where((d) => !d.isError).toList();
     final bestDay = validDays.reduce((a, b) => a.calories > b.calories ? a : b);
-    final worstDay = validDays.reduce((a, b) => a.calories < b.calories ? a : b);
-    
+    final worstDay = validDays.reduce(
+      (a, b) => a.calories < b.calories ? a : b,
+    );
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
@@ -86,9 +128,9 @@ class ReportTab extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // GRAFIK BAR CHART (FIXED - NO OVERFLOW)
             Container(
               padding: const EdgeInsets.all(16),
@@ -98,7 +140,11 @@ class ReportTab extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.bar_chart_rounded, size: 20, color: AppTheme.textSecondary),
+                      const Icon(
+                        Icons.bar_chart_rounded,
+                        size: 20,
+                        color: AppTheme.textSecondary,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         local.weeklyCalories,
@@ -110,7 +156,10 @@ class ReportTab extends StatelessWidget {
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppTheme.lightGreen,
                           borderRadius: BorderRadius.circular(20),
@@ -127,7 +176,7 @@ class ReportTab extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Scrollable bar chart
                   SizedBox(
                     height: 170,
@@ -139,24 +188,41 @@ class ReportTab extends StatelessWidget {
                         children: List.generate(weeklyData.length, (i) {
                           final data = weeklyData[i];
                           final maxCal = 2200.0;
-                          double heightPercent = data.isError ? 0.3 : (data.calories / maxCal).clamp(0.08, 1.0);
-                          final barHeight = (heightPercent * 120).clamp(12.0, 120.0);
-                          final isBest = !data.isError && data.calories == bestDay.calories;
-                          
+                          double heightPercent = data.isError
+                              ? 0.3
+                              : (data.calories / maxCal).clamp(0.08, 1.0);
+                          final barHeight = (heightPercent * 120).clamp(
+                            12.0,
+                            120.0,
+                          );
+                          final isBest =
+                              !data.isError &&
+                              data.calories == bestDay.calories;
+
                           return SizedBox(
                             width: 50,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 if (data.isError)
-                                  const Icon(Icons.error_outline, size: 14, color: Colors.red)
+                                  const Icon(
+                                    Icons.error_outline,
+                                    size: 14,
+                                    color: Colors.red,
+                                  )
                                 else
                                   Text(
                                     '${data.calories}',
                                     style: TextStyle(
                                       fontSize: 9,
-                                      fontWeight: isBest ? FontWeight.bold : FontWeight.normal,
-                                      color: _getColorByCalorie(data.calories, targetMin, targetMax),
+                                      fontWeight: isBest
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: _getColorByCalorie(
+                                        data.calories,
+                                        targetMin,
+                                        targetMax,
+                                      ),
                                     ),
                                   ),
                                 const SizedBox(height: 4),
@@ -166,19 +232,29 @@ class ReportTab extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: data.isError
                                         ? const Color.fromARGB(255, 243, 23, 23)
-                                        : _getColorByCalorie(data.calories, targetMin, targetMax).withOpacity(0.7),
+                                        : _getColorByCalorie(
+                                            data.calories,
+                                            targetMin,
+                                            targetMax,
+                                          ).withOpacity(0.7),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   _shortDayName(data.day),
-                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   data.date,
-                                  style: const TextStyle(fontSize: 8, color: AppTheme.textHint),
+                                  style: const TextStyle(
+                                    fontSize: 8,
+                                    color: AppTheme.textHint,
+                                  ),
                                 ),
                               ],
                             ),
@@ -187,7 +263,7 @@ class ReportTab extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -202,9 +278,9 @@ class ReportTab extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // RINGKASAN
             Container(
               padding: const EdgeInsets.all(16),
@@ -212,25 +288,40 @@ class ReportTab extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('📊 Ringkasan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text(
+                    '📊 Ringkasan',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   const SizedBox(height: 12),
                   _buildInfoRow('🍽️ Total Makanan', '$totalFoods items'),
                   const SizedBox(height: 8),
-                  _buildInfoRow('🎯 Target Harian', '$targetMin - $targetMax kalori'),
+                  _buildInfoRow(
+                    '🎯 Target Harian',
+                    '$targetMin - $targetMax kalori',
+                  ),
                   const SizedBox(height: 8),
-                  _buildInfoRow('🏆 Hari Terbaik', '${bestDay.day} (${bestDay.calories} kal)'),
+                  _buildInfoRow(
+                    '🏆 Hari Terbaik',
+                    '${bestDay.day} (${bestDay.calories} kal)',
+                  ),
                   const SizedBox(height: 8),
-                  _buildInfoRow('⚠️ Hari Terendah', '${worstDay.day} (${worstDay.calories} kal)'),
+                  _buildInfoRow(
+                    '⚠️ Hari Terendah',
+                    '${worstDay.day} (${worstDay.calories} kal)',
+                  ),
                   if (weeklyData.any((d) => d.isError)) ...[
                     const SizedBox(height: 8),
-                    _buildInfoRow('Data Terendah ', '${worstDay.day} (${worstDay.calories} kal)'),
+                    _buildInfoRow(
+                      'Data Terendah ',
+                      '${worstDay.day} (${worstDay.calories} kal)',
+                    ),
                   ],
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // SARAN
             Container(
               padding: const EdgeInsets.all(16),
@@ -241,13 +332,18 @@ class ReportTab extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('💡 Saran Minggu Depan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    '💡 Saran Minggu Depan',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 10),
-                  _buildSuggestion('🥩 Tingkatkan protein di hari Senin & Minggu'),
+                  _buildSuggestion(
+                    '🥩 Tingkatkan protein di hari Senin & Minggu',
+                  ),
                   const SizedBox(height: 6),
-                  _buildSuggestion('⚠️ Perbaiki data error di hari Jumat'),
-                  const SizedBox(height: 6),
-                  _buildSuggestion('📈 Pertahankan konsistensi seperti hari Kamis'),
+                  _buildSuggestion(
+                    '📈 Pertahankan konsistensi seperti hari Kamis',
+                  ),
                 ],
               ),
             ),
@@ -256,7 +352,7 @@ class ReportTab extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildMainStatCard({
     required IconData icon,
     required String value,
@@ -277,27 +373,47 @@ class ReportTab extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               value,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-            Text(unit, style: const TextStyle(fontSize: 9, color: AppTheme.textHint)),
+            Text(
+              unit,
+              style: const TextStyle(fontSize: 9, color: AppTheme.textHint),
+            ),
             const SizedBox(height: 2),
-            Text(label, style: const TextStyle(fontSize: 9, color: AppTheme.textSecondary), textAlign: TextAlign.center),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 9,
+                color: AppTheme.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildInfoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+        ),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
       ],
     );
   }
-  
+
   Widget _buildSuggestion(String text) {
     return Row(
       children: [
@@ -306,33 +422,40 @@ class ReportTab extends StatelessWidget {
       ],
     );
   }
-  
+
   Widget _buildLegend(String label, Color color) {
     return Row(
       children: [
         Container(width: 10, height: 10, color: color),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 9, color: AppTheme.textHint)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 9, color: AppTheme.textHint),
+        ),
       ],
     );
   }
-  
+
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
-        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2)),
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 2),
+        ),
       ],
     );
   }
-  
+
   Color _getColorByCalorie(int calorie, int min, int max) {
     if (calorie < min) return Colors.red;
     if (calorie > max) return Colors.orange;
     return Colors.green;
   }
-  
+
   String _shortDayName(String day) {
     if (day.contains('Sen')) return 'Sen';
     if (day.contains('Sel')) return 'Sel';
@@ -351,7 +474,7 @@ class DailyCalorie {
   final int calories;
   final bool isError;
   final String? errorMsg;
-  
+
   DailyCalorie({
     required this.day,
     required this.date,

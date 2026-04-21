@@ -9,6 +9,7 @@ import '../../../providers/nutrition_provider.dart';
 import '../../../widgets/calorie_ring.dart';
 import '../../../widgets/nutrition_card.dart';
 import '../../../widgets/meal_item_card.dart';
+import '../../../widgets/daily_progress_section.dart';
 
 class DashboardTab extends StatelessWidget {
   const DashboardTab({super.key});
@@ -384,166 +385,21 @@ FadeInUp(
                     // Recent Meals - DIGANTI DENGAN PROGRESS MAKAN
                     FadeInUp(
                       delay: const Duration(milliseconds: 600),
-                      child: Consumer<NutritionProvider>(
-                        builder: (context, provider, child) {
-                          return Container(
-                            margin: const EdgeInsets.only(top: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  '📊 Progress Makan Hari Ini',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                // Ringkasan total kalori
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.green.shade400,
-                                        Colors.green.shade600,
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Total Kalori Hari Ini',
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${provider.consumedCalories.round()}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 28,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          const Text(
-                                            'Target Harian',
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${provider.calorieTarget} kal',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // Progress per jenis makan (sementara pakai container biasa dulu)
-                                _buildMealProgressCard(
-                                  mealName: 'Sarapan',
-                                  mealIcon: '🍳',
-                                  consumed: provider.consumedBreakfast,
-                                  target: provider.targetBreakfast,
-                                  color: Colors.orange,
-                                ),
-
-                                _buildMealProgressCard(
-                                  mealName: 'Makan Siang',
-                                  mealIcon: '🍲',
-                                  consumed: provider.consumedLunch,
-                                  target: provider.targetLunch,
-                                  color: Colors.blue,
-                                ),
-
-                                _buildMealProgressCard(
-                                  mealName: 'Makan Malam',
-                                  mealIcon: '🍽️',
-                                  consumed: provider.consumedDinner,
-                                  target: provider.targetDinner,
-                                  color: Colors.purple,
-                                ),
-
-                                _buildMealProgressCard(
-                                  mealName: 'Camilan',
-                                  mealIcon: '🍎',
-                                  consumed: provider.consumedSnack,
-                                  target: provider.targetSnack,
-                                  color: Colors.teal,
-                                ),
-
-                                const SizedBox(height: 8),
-
-                                // Tombol aksi cepat (opsional, karena sudah ada quick actions di atas)
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            AppConstants.scanRoute,
-                                          );
-                                        },
-                                        icon: const Icon(Icons.qr_code_scanner),
-                                        label: const Text('Scan Makanan'),
-                                        style: OutlinedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: () {
-                                          // Navigasi ke halaman catat manual
-                                        },
-                                        icon: const Icon(Icons.edit_note),
-                                        label: const Text('Catat Manual'),
-                                        style: ElevatedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const DailyProgressSection(),
+                          ],
+                        ),
                       ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Food Recommendations
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 700),
+                      child: _buildRecommendationSection(context),
                     ),
                   ],
                 ),
@@ -555,65 +411,65 @@ FadeInUp(
     );
   }
 
-  Widget _buildMealProgressCard({
-    required String mealName,
-    required String mealIcon,
-    required double consumed,
-    required double target,
-    required Color color,
-  }) {
-    final percentage = (consumed / target).clamp(0.0, 1.0);
-    final isComplete = consumed >= target;
+  Widget _buildRecommendationSection(BuildContext context) {
+    // Dynamic recommendation based on time
+    final hour = DateTime.now().hour;
+    String title = 'Rekomendasi Makanan';
+    List<Map<String, dynamic>> items = [];
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(mealIcon, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  mealName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+    if (hour < 10) {
+      title = 'Rekomendasi Sarapan';
+      items = AppConstants.breakfastMenu;
+    } else if (hour < 15) {
+      title = 'Rekomendasi Makan Siang';
+      items = AppConstants.lunchMenu;
+    } else if (hour < 18) {
+      title = 'Rekomendasi Snack Sore';
+      items = AppConstants.snackMenu;
+    } else {
+      title = 'Rekomendasi Makan Malam';
+      items = AppConstants.dinnerMenu;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
               ),
-              Text(
-                '${consumed.round()}/${target.round()} kal',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: isComplete ? Colors.green : Colors.grey.shade600,
-                ),
-              ),
-            ],
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, AppConstants.recommendationRoute);
+              },
+              child: const Text('Lihat Semua'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return _FoodRecommendationCard(
+                name: item['name'],
+                calories: (item['calories'] as num).toDouble(),
+                icon: item['icon'] ?? '🍽️',
+              );
+            },
           ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: percentage,
-            color: color,
-            backgroundColor: color.withValues(alpha: 0.15),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -700,6 +556,76 @@ class _QuickActionCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _FoodRecommendationCard extends StatelessWidget {
+  final String name;
+  final double calories;
+  final String icon;
+
+  const _FoodRecommendationCard({
+    required this.name,
+    required this.calories,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 140,
+      margin: const EdgeInsets.only(right: 16, bottom: 8, top: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 36)),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+                height: 1.2,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.lightGreen,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '${calories.round()} kal',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.darkGreen,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

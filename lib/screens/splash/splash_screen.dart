@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 110,
                       height: 110,
                       decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
@@ -70,10 +70,12 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.eco_rounded,
-                        color: Colors.white,
-                        size: 60,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(32),
+                        child: Image.asset(
+                          'assets/images/logo_2.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
@@ -116,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen>
                     spacing: 10,
                     runSpacing: 10,
                     children: const [
-                      _FeaturePill(icon: Icons.camera_alt_rounded, label: 'AI Scan'),
+                      _FeaturePill(icon: Icons.camera_alt_rounded, label: 'Scan Meal'),
                       _FeaturePill(icon: Icons.restaurant_menu_rounded, label: 'Meal Plan'),
                       _FeaturePill(icon: Icons.analytics_rounded, label: 'Nutrisi'),
                       _FeaturePill(icon: Icons.track_changes_rounded, label: 'Kalori'),
@@ -128,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen>
                   delay: const Duration(milliseconds: 800),
                   duration: const Duration(milliseconds: 600),
                   child: CustomButton(
-                    text: 'Mulai Sekarang',
+                    text: 'Mulai',
                     icon: Icons.arrow_forward_rounded,
                     onPressed: () =>
                         Navigator.pushNamed(context, AppConstants.registerRoute),

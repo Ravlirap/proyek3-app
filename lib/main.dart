@@ -19,6 +19,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/scan/scan_screen.dart';
 import 'screens/scan/analysis_result_screen.dart';
 import 'screens/meal_plan/meal_plan_screen.dart';
+import 'screens/home/recommendation_detail_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +68,7 @@ class GoHealthApp extends StatelessWidget {
               AppConstants.analysisResultRoute: (_) =>
                   const AnalysisResultScreen(),
               AppConstants.mealPlanRoute: (_) => const MealPlanScreen(),
+              AppConstants.recommendationRoute: (_) => const RecommendationDetailScreen(),
             },
           );
         },
