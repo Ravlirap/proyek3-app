@@ -19,6 +19,7 @@ dependencies:
   smooth_page_indicator: ^1.1.0
   animate_do: ^3.3.4
   shared_preferences: ^2.2.2
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:

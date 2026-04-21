@@ -34,13 +34,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _doRegister() async {
     if (!_formKey.currentState!.validate()) return;
+
     if (!_acceptTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Harap setujui syarat & ketentuan'),
-        backgroundColor: Colors.red,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Harap setujui syarat & ketentuan'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
+
     final authProvider = context.read<AuthProvider>();
     final userProvider = context.read<UserProvider>();
 
@@ -49,10 +53,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _emailCtrl.text.trim(),
       _passCtrl.text,
     );
-    if (ok && mounted) {
+
+    if (!mounted) return;
+
+    if (ok) {
       userProvider.setName(_nameCtrl.text.trim());
       userProvider.setEmail(_emailCtrl.text.trim());
       Navigator.pushReplacementNamed(context, AppConstants.onboardingRoute);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Registrasi gagal'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

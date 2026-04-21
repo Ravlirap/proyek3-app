@@ -28,10 +28,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _doLogin() async {
     if (!_formKey.currentState!.validate()) return;
+
     final auth = context.read<AuthProvider>();
     final ok = await auth.login(_emailCtrl.text.trim(), _passCtrl.text);
-    if (ok && mounted) {
+
+    if (!mounted) return;
+
+    if (ok) {
       Navigator.pushReplacementNamed(context, AppConstants.homeRoute);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(auth.errorMessage ?? 'Login gagal'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
