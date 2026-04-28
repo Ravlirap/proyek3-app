@@ -11,181 +11,59 @@ class HistoryTab extends StatefulWidget {
 }
 
 class _HistoryTabState extends State<HistoryTab> {
-  String _selectedFilter = 'Harian';
-  final List<String> _filters = ['Harian', 'Mingguan', 'Bulanan'];
+  DateTime selectedDate = DateTime(2026, 4, 27);
 
-  // DATA YANG BENER - berupa List, bukan Map
-  final List<Map<String, dynamic>> _allHistoryData = [
-    {
-      'date': '2026-04-15',
-      'totalCalories': 740,
-      'totalItems': 4,
-      'remaining': 590,
-      'meals': [
-        {
-          'type': 'Sarapan',
-          'items': [
-            {'name': 'Oatmeal Berry Bowl', 'time': '03:46', 'calories': 320},
-            {'name': 'Telur Rebus', 'time': '03:16', 'calories': 140},
-          ],
-        },
-        {
-          'type': 'Camilan',
-          'items': [
-            {'name': 'Greek Yogurt', 'time': '05:46', 'calories': 130},
-            {'name': 'Almond', 'time': '07:46', 'calories': 150},
-          ],
-        },
-      ],
-    },
+  final Color primaryGreen = const Color(0xFF00A86B);
+  final Color textDark = const Color(0xFF111827);
+  final Color bgColor = const Color(0xFFF8F9FB);
+
+  final List<Map<String, dynamic>> macroData = [
+    {'icon': '🥩', 'title': 'Protein', 'value': '0 / 135', 'color': Color(0xFFFFDDE1)},
+    {'icon': '💧', 'title': 'Lemak', 'value': '0 / 50', 'color': Color(0xFFFFF7B8)},
+    {'icon': '🌾', 'title': 'Karbohidrat', 'value': '0 / 203', 'color': Color(0xFFFFE8C7)},
+    {'icon': '🌿', 'title': 'Serat', 'value': '0 / 25', 'color': Color(0xFFD8F8E4)},
   ];
 
-  // Ambil data hari ini (index 0)
-  Map<String, dynamic> get _todayData => _allHistoryData[0];
+  final List<Map<String, dynamic>> mealData = [
+    {'title': 'Sarapan', 'subtitle': '300-500 kal', 'icon': '🍳'},
+    {'title': 'Makan siang', 'subtitle': '300-600 kal', 'icon': '🥗'},
+    {'title': 'Makan malam', 'subtitle': '400-700 kal', 'icon': '🍽️'},
+    {'title': 'Camilan', 'subtitle': '100-300 kal', 'icon': '🍎'},
+  ];
 
-  String get _formattedDate {
-    return DateFormat('EEEE, d MMMM yyyy', 'id').format(DateTime.now());
-  }
+  List<DateTime> get weekDates => [
+        DateTime(2026, 4, 23),
+        DateTime(2026, 4, 24),
+        DateTime(2026, 4, 25),
+        DateTime(2026, 4, 26),
+        DateTime(2026, 4, 27),
+      ];
 
   @override
   Widget build(BuildContext context) {
+    final monthYear = DateFormat('MMMM yyyy', 'id_ID').format(selectedDate);
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: bgColor,
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(22, 24, 22, 110),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _formattedDate,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Riwayat Makanan',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2E7D32),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Filter Chips
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: _filters.map((filter) {
-                    final isSelected = _selectedFilter == filter;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedFilter = filter;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF4CAF50)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.transparent
-                                  : Colors.grey[300]!,
-                            ),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: const Color(0xFF4CAF50)
-                                          .withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Text(
-                            filter,
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.grey[700],
-                              fontWeight:
-                                  isSelected ? FontWeight.bold : FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Summary Row - 3 Cards
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    _buildSummaryCard(
-                      title: 'Total Kebutuhan 1 hari',
-                      value: '${_todayData['totalCalories']}',
-                      unit: 'kal',
-                      color: Colors.orange,
-                    ),
-                    const SizedBox(width: 12),
-                    _buildSummaryCard(
-                      title: 'Total Kebutuhan',
-                      value: '${_todayData['totalItems']}',
-                      unit: 'item',
-                      color: Colors.blue,
-                    ),
-                    const SizedBox(width: 12),
-                    _buildSummaryCard(
-                      title: 'Tersisa',
-                      value: '${_todayData['remaining']}',
-                      unit: 'kal',
-                      color: Colors.green,
-                    ),
-                  ],
-                ),
-              ),
-
+              _buildHeader(monthYear),
+              const SizedBox(height: 22),
+              _buildDateSelector(),
               const SizedBox(height: 24),
-
-              // Meals Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    // Looping meals dengan aman
-                    for (var i = 0; i < (_todayData['meals'] as List).length; i++)
-                      _buildMealCard(
-                        mealType: (_todayData['meals'][i] as Map)['type'] as String,
-                        items: (_todayData['meals'][i] as Map)['items'] as List<Map<String, dynamic>>,
-                      ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 80),
+              _buildMacroCards(),
+              const SizedBox(height: 18),
+              _buildWeightTracker(),
+              const SizedBox(height: 22),
+              _buildCalorieCircle(),
+              const SizedBox(height: 22),
+              ...mealData.map((meal) => _buildMealRow(meal)),
+              const SizedBox(height: 28),
+              _buildAnalysisSection(),
             ],
           ),
         ),
@@ -193,224 +71,249 @@ class _HistoryTabState extends State<HistoryTab> {
     );
   }
 
-  Widget _buildSummaryCard({
-    required String title,
-    required String value,
-    required String unit,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
+  Widget _buildHeader(String monthYear) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          monthYear,
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: textDark),
+        ),
+        Row(
+          children: [
+            _arrowButton(Icons.chevron_left),
+            const SizedBox(width: 10),
+            _arrowButton(Icons.chevron_right, disabled: true),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.grey[500],
-                height: 1.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+      ],
+    );
+  }
+
+  Widget _arrowButton(IconData icon, {bool disabled = false}) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: disabled
+          ? null
+          : () {
+              setState(() {
+                selectedDate = DateTime(selectedDate.year, selectedDate.month - 1, selectedDate.day);
+              });
+            },
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        child: Icon(icon, color: disabled ? Colors.grey.shade300 : Colors.grey.shade700, size: 28),
+      ),
+    );
+  }
+
+  Widget _buildDateSelector() {
+    final dayNames = ['Kam', 'Jum', 'Sab', 'Min', 'Sen'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(weekDates.length, (index) {
+        final date = weekDates[index];
+        final isSelected = date.day == selectedDate.day;
+
+        return GestureDetector(
+          onTap: () => setState(() => selectedDate = date),
+          child: Container(
+            width: 64,
+            height: 76,
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFFBDEEFF) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(dayNames[index], style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                const SizedBox(height: 6),
+                Text('${date.day}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: textDark)),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildMacroCards() {
+    return Row(
+      children: List.generate(macroData.length, (index) {
+        final macro = macroData[index];
+
+        return Expanded(
+          child: Container(
+            height: 145,
+            margin: EdgeInsets.only(right: index == macroData.length - 1 ? 0 : 8),
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: macro['color'] as Color,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(macro['icon'] as String, style: const TextStyle(fontSize: 22)),
+                const SizedBox(height: 6),
                 Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+                  macro['title'] as String,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, height: 1.1, color: textDark, fontWeight: FontWeight.w700),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(height: 8),
+                Container(
+                  height: 4,
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.8), borderRadius: BorderRadius.circular(20)),
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  unit,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[400],
-                  ),
+                  macro['value'] as String,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildWeightTracker() {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () => _showComingSoon('Lacak berat badan'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.monitor_weight_outlined, color: Colors.grey.shade600),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text('Mulai lacak berat badan Anda', style: TextStyle(fontSize: 15, color: Colors.grey.shade600)),
+            ),
+            const Icon(Icons.add, color: Colors.blue, size: 24),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMealCard({
-    required String mealType,
-    required List<Map<String, dynamic>> items,
-  }) {
+  Widget _buildCalorieCircle() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Meal Header
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Align(
+            alignment: Alignment.topRight,
+            child: Icon(Icons.info_outline, color: Colors.grey.shade300, size: 22),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: 220,
+            height: 220,
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFE9F8EE)),
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Row(
+                SizedBox(
+                  width: 205,
+                  height: 205,
+                  child: CircularProgressIndicator(
+                    value: 0.73,
+                    strokeWidth: 11,
+                    backgroundColor: Colors.white,
+                    color: Color(0xFF58D68D),
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _getMealColor(mealType),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
+                    Text('0', style: TextStyle(fontSize: 38, fontWeight: FontWeight.w800, color: textDark)),
+                    const SizedBox(height: 4),
                     Text(
-                      mealType,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      'kalori yang dimakan\nhari ini',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12, height: 1.2, color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Target: 1800',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      '1316.4 terbakar\nsejauh ini',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 11, height: 1.15, color: Colors.grey.shade500),
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${items.length} menu',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
-
-          // Divider
+          const SizedBox(height: 14),
           Container(
-            height: 1,
-            color: Colors.grey[100],
+            width: double.infinity,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(color: const Color(0xFFDDF8E7), borderRadius: BorderRadius.circular(22)),
+            child: const Text(
+              '1316.4 kal kekurangan',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Color(0xFF0F9F63), fontSize: 13, fontWeight: FontWeight.w800),
+            ),
           ),
-
-          // Food Items
-          ...items.map((item) => _buildFoodItem(
-                name: item['name'] as String,
-                time: item['time'] as String,
-                calories: item['calories'] as int,
-              )),
         ],
       ),
     );
   }
 
-  Widget _buildFoodItem({
-    required String name,
-    required String time,
-    required int calories,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  Widget _buildMealRow(Map<String, dynamic> meal) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
       child: Row(
         children: [
-          // Food icon
           Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.restaurant_outlined,
-              size: 22,
-              color: Colors.grey[500],
-            ),
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey.shade200, width: 3)),
+            child: Center(child: Text(meal['icon'] as String, style: const TextStyle(fontSize: 24))),
           ),
-          const SizedBox(width: 12),
-
-          // Food info
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                Text(meal['title'] as String, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: textDark)),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 12,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      time,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
-                ),
+                Text(meal['subtitle'] as String, style: TextStyle(fontSize: 14, color: Colors.grey.shade500)),
               ],
             ),
           ),
-
-          // Calories
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '$calories kal',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Colors.orange,
-              ),
+          InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => _showComingSoon('Tambah ${meal['title']}'),
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(14)),
+              child: const Icon(Icons.add, color: Colors.black54),
             ),
           ),
         ],
@@ -418,18 +321,172 @@ class _HistoryTabState extends State<HistoryTab> {
     );
   }
 
-  Color _getMealColor(String mealType) {
-    switch (mealType) {
-      case 'Sarapan':
-        return Colors.orange;
-      case 'Camilan':
-        return Colors.purple;
-      case 'Makan Siang':
-        return Colors.blue;
-      case 'Makan Malam':
-        return Colors.indigo;
-      default:
-        return Colors.green;
-    }
+  Widget _buildAnalysisSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Analisis', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: textDark)),
+        const SizedBox(height: 18),
+        _buildCalendarCard(),
+        const SizedBox(height: 18),
+        Row(
+          children: [
+            _buildStatCard(icon: Icons.check_circle_outline, iconColor: primaryGreen, title: 'Check-in Bulanan', value: '0', unit: 'hari'),
+            const SizedBox(width: 14),
+            _buildStatCard(icon: Icons.bolt_outlined, iconColor: Colors.blue, title: 'Total Check-in', value: '1', unit: 'hari'),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            _buildStatCard(icon: Icons.percent, iconColor: Colors.amber, title: 'Tingkat Bulanan', value: '0', unit: '%'),
+            const SizedBox(width: 14),
+            _buildStatCard(icon: Icons.local_fire_department_outlined, iconColor: Colors.redAccent, title: 'Beruntun', value: '0', unit: 'hari'),
+          ],
+        ),
+        const SizedBox(height: 22),
+        _buildMacroBalanceCard(),
+      ],
+    );
+  }
+
+  Widget _buildCalendarCard() {
+    final days = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+      child: Column(
+        children: [
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: days.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, mainAxisSpacing: 14, crossAxisSpacing: 10),
+            itemBuilder: (context, index) {
+              final day = days[index];
+              final isSelected = day == selectedDate.day;
+
+              return InkWell(
+                borderRadius: BorderRadius.circular(30),
+                onTap: () => setState(() => selectedDate = DateTime(2026, 4, day)),
+                child: Container(
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: isSelected ? const Color(0xFFEAF4FF) : Colors.transparent),
+                  child: Center(
+                    child: Text(
+                      '$day',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                        color: isSelected ? Colors.blue : textDark,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'Tekan lama atau ketuk dua kali pada hari dengan data nutrisi untuk melihat detail.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade500, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String value,
+    required String unit,
+  }) {
+    return Expanded(
+      child: Container(
+        height: 122,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: iconColor, size: 24),
+                const SizedBox(width: 8),
+                Expanded(child: Text(title, style: TextStyle(fontSize: 14, color: textDark, fontWeight: FontWeight.w500))),
+              ],
+            ),
+            const Spacer(),
+            Center(
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: value, style: TextStyle(color: textDark, fontSize: 28, fontWeight: FontWeight.w800)),
+                    TextSpan(text: ' $unit', style: TextStyle(color: Colors.grey.shade500, fontSize: 14)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMacroBalanceCard() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Keseimbangan Makro Hari Ini', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: textDark)),
+          const SizedBox(height: 24),
+          _buildMacroProgress(icon: '🥩', label: 'Protein', value: '0g / 135g', color: const Color(0xFFF49BA5)),
+          _buildMacroProgress(icon: '💧', label: 'Lemak', value: '0g / 50g', color: const Color(0xFFF4D23C)),
+          _buildMacroProgress(icon: '🌾', label: 'Karbohidrat', value: '0g / 203g', color: const Color(0xFFF2A65A)),
+          _buildMacroProgress(icon: '🌿', label: 'Serat', value: '0g / 25g', color: const Color(0xFF37C978)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMacroProgress({
+    required String icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 12),
+              Text(label, style: TextStyle(fontSize: 16, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+              const Spacer(),
+              Text(value, style: TextStyle(fontSize: 16, color: textDark, fontWeight: FontWeight.w700)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: LinearProgressIndicator(value: 0, minHeight: 8, backgroundColor: color.withOpacity(0.18), color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showComingSoon(String text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(text), duration: const Duration(seconds: 1), behavior: SnackBarBehavior.floating),
+    );
   }
 }

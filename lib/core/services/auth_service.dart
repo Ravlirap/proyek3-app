@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://192.168.63.217:8000/api';
+  static const String baseUrl = 'http://192.168.0.102:8000/api';
 
   Map<String, String> _headers({String? token}) {
     return {
@@ -41,10 +41,7 @@ class AuthService {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       headers: _headers(),
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
+      body: jsonEncode({'email': email, 'password': password}),
     );
 
     return _handleResponse(response);
@@ -71,8 +68,9 @@ class AuthService {
   }
 
   Map<String, dynamic> _handleResponse(http.Response response) {
-    final dynamic decoded =
-        response.body.isNotEmpty ? jsonDecode(response.body) : {};
+    final dynamic decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : {};
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return decoded as Map<String, dynamic>;
