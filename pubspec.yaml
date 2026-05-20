@@ -1,0 +1,44 @@
+name: flutter_app_1
+description: "GoHealth – Smart Food AI"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2  # Kembalikan ke 0.20.2 (harus sama dengan flutter_localizations)
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  google_fonts: ^6.2.1
+  percent_indicator: ^4.2.3
+  smooth_page_indicator: ^1.1.0
+  animate_do: ^3.3.4
+  shared_preferences: ^2.2.2
+  http: ^1.2.2
+  image_picker: ^1.1.2
+  google_sign_in: ^6.1.0
+  logger: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
